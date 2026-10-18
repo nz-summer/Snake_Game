@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f8f7f2">
+  <meta name="description" content="Play Snake for free. No ads, accounts, or tracking. A Moonstar Games browser game.">
+  <title>Snake — Moonstar</title>
+  <link rel="icon" href="shared/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="shared/style.css?v=2026-10-09">
+
+  <script src="sound/audio.js?v=2026-10-09" defer></script>
+  <script src="shared/ui.js?v=2026-10-09" defer></script>
+  <script src="shared/input.js?v=2026-10-09" defer></script>
+  <script src="logic.js?v=2026-10-09" defer></script>
+  <script src="game.js?v=2026-10-09" defer></script>
+</head>
+<body class="game-page" data-game="snake">
+  <a class="skip-link" href="#main">Skip to game</a>
+  <h1 class="sr-only">Snake</h1>
+  <main id="main" class="game-main">
+    <div class="game-layout" aria-label="Snake">
+      <div class="hud">
+        <div class="stats" aria-label="Game statistics">
+          <div class="stat stat-score">
+            <svg class="stat-icon" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 9c-5-3.500-11-1-11 6 0 7 4 12 8 12 1.500 0 2-.6 3-.6s1.500.6 3 .6c4 0 8-5 8-12 0-7-6-9.500-11-6z" fill="#d93a1f"/><ellipse cx="10.500" cy="15" rx="2" ry="3.500" fill="#fff" opacity=".35" transform="rotate(20 10.500 15)"/><path d="M16 9c0-3 1-5 3-6.500" fill="none" stroke="#6b4a2b" stroke-width="1.800" stroke-linecap="round"/><path d="M18 7c1-3 4-4.500 7-4-.5 3-3.500 5-7 4z" fill="#58a64a"/></svg>
+            <div class="stat-text"><span class="stat-label">Score</span><span id="score" class="stat-value">0</span></div>
+          </div>
+          <div class="stat stat-best">
+            <svg class="stat-icon" viewBox="0 0 32 32" aria-hidden="true"><path d="M3 11l6 5 7-10 7 10 6-5-3 16H6z" fill="#f6b21c"/><path d="M6 27h20v2.500H6z" fill="#e39a0c"/><circle cx="3" cy="11" r="2" fill="#f6b21c"/><circle cx="16" cy="6" r="2" fill="#f6b21c"/><circle cx="29" cy="11" r="2" fill="#f6b21c"/></svg>
+            <div class="stat-text"><span class="stat-label">Best Score</span><span id="best" class="stat-value">0</span></div>
+          </div>        </div>
+        <div class="hud-controls" aria-label="Game controls">
+          <button id="pause" class="icon-button" type="button" aria-label="Pause" title="Pause" aria-pressed="false">
+            <svg class="pause-icon" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
+            <svg class="play-icon" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M7 4.5v15l12-7.5z"/></svg>
+          </button>
+          <button id="sound" class="icon-button" type="button" aria-label="Sound off" title="Sound" aria-pressed="false">
+            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z" fill="currentColor"/><g class="sound-on"><path d="M15.5 9a4 4 0 0 1 0 6"/><path d="M18 6.5a7.5 7.5 0 0 1 0 11"/></g><path class="sound-off" d="M16 9.5l5 5m0-5l-5 5"/></svg>
+          </button>
+          <details id="settings" class="game-settings" hidden>
+            <summary class="icon-button" aria-label="Settings and controls" title="Settings and controls">
+              <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="3" fill="var(--paper)"/><circle cx="15" cy="17" r="3" fill="var(--paper)"/></svg>
+            </summary>
+            <div class="settings-content">
+              <p class="settings-label">Difficulty</p>
+              <div class="difficulty" role="group" aria-label="Difficulty (starts a new game)">
+                <button type="button" data-difficulty="easy" aria-pressed="false">Easy</button>
+                <button type="button" data-difficulty="normal" aria-pressed="true">Normal</button>
+                <button type="button" data-difficulty="hard" aria-pressed="false">Hard</button>
+              </div>
+              <button id="restart" type="button">Restart</button>
+              <p id="control-hint" class="control-hint">Arrow keys / WASD · Swipe or use the arrows · Gamepad supported<br>R to restart · Esc to pause / exit fullscreen</p>
+            </div>
+          </details>
+          <button id="fullscreen" class="icon-button" type="button" aria-label="Fullscreen" title="Fullscreen" aria-pressed="false" hidden>
+            <svg class="expand-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/></svg>
+            <svg class="collapse-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h5V3m8 0v5h5M8 21v-5H3m13 5v-5h5"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="play-area">
+        <canvas id="board" class="board" width="500" height="500" tabindex="0" aria-label="Snake game board" aria-describedby="control-hint">Arrow keys / WASD · Swipe or use the arrows · Gamepad supported</canvas>
+        <div id="overlay" class="overlay" role="region" aria-labelledby="overlay-title" hidden>
+          <div class="overlay-card">
+            <svg class="ready-art" viewBox="0 0 320 130" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+              <defs>
+                <linearGradient id="ready-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#bfe3d0"/><stop offset="1" stop-color="#f6f3dc"/></linearGradient>
+                <pattern id="ready-grass" x="0" y="100" width="52" height="52" patternUnits="userSpaceOnUse"><rect width="52" height="52" fill="#8fbf5f"/><rect width="26" height="26" fill="#a6d174"/><rect x="26" y="26" width="26" height="26" fill="#a6d174"/></pattern>
+              </defs>
+              <rect width="320" height="130" fill="url(#ready-sky)"/>
+              <circle cx="40" cy="34" r="15" fill="#f6c453"/>
+              <ellipse cx="150" cy="30" rx="28" ry="8" fill="#fff" opacity=".7"/><ellipse cx="176" cy="25" rx="18" ry="7" fill="#fff" opacity=".7"/>
+              <rect y="100" width="320" height="30" fill="url(#ready-grass)"/>
+              <path d="M-12 112H78C112 112 118 86 154 86H198" fill="none" stroke="#3f7a45" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M30 112h0M64 112h0M104 96h0M138 86h0" stroke="#69a45c" stroke-width="9" stroke-linecap="round"/>
+              <ellipse cx="206" cy="86" rx="22" ry="17" fill="#2f6538"/>
+              <circle cx="205" cy="79" r="5.5" fill="#fffde8"/><circle cx="217" cy="79" r="5.5" fill="#fffde8"/><circle cx="207" cy="79.5" r="2.4" fill="#252921"/><circle cx="219" cy="79.5" r="2.4" fill="#252921"/>
+              <path d="M226 90h14l4-3m-4 3l4 3" fill="none" stroke="#bd411c" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="276" cy="94" r="14" fill="#c93f1f"/><circle cx="271" cy="89" r="3.5" fill="#e87a5d"/><path d="M276 81c0-6 3-9 7-10" fill="none" stroke="#526c36" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+            <p class="ready-best"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5z" fill="#f2a60c"/></svg>Best <strong id="ready-best">0</strong></p>
+            <div id="overlay-keys" class="overlay-keys" role="group" aria-label="How to play: steer with the arrow keys, WASD or a swipe" hidden>
+              <button type="button" data-direction="up" aria-label="Up">↑</button>
+              <button type="button" data-direction="left" aria-label="Left">←</button>
+              <button type="button" data-direction="down" aria-label="Down">↓</button>
+              <button type="button" data-direction="right" aria-label="Right">→</button>
+              <p>Arrow keys, WASD or swipe</p>
+            </div>
+            <h2 id="overlay-title"></h2>
+            <p id="overlay-message"></p>
+            <button id="overlay-action" type="button" class="primary">Play again</button>
+          </div>
+        </div>
+      </div>
+      <div class="dpad" role="group" aria-label="Direction controls">
+        <button type="button" data-direction="left" aria-label="Move left">←</button>
+        <button type="button" data-direction="up" aria-label="Move up">↑</button>
+        <button type="button" data-direction="down" aria-label="Move down">↓</button>
+        <button type="button" data-direction="right" aria-label="Move right">→</button>
+      </div>
+    </div>
+    <p id="announcement" class="sr-only" role="status" aria-live="polite"></p>
+    <noscript><p>This game needs JavaScript enabled in your browser.</p></noscript>
+  </main>
+</body>
+</html>
