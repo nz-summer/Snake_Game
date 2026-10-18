@@ -13,7 +13,7 @@
   font-synthesis: none;
 }
 * { box-sizing: border-box; }
-html, body { height: 100%; overflow: hidden; }
+html, body { height: 100%; overflow: hidden; background: var(--paper); }
 body { margin: 0; }
 button, select { font: inherit; }
 a { color: inherit; }
@@ -40,7 +40,7 @@ h1 { letter-spacing: -1.7px; }
 /* Fills the iframe viewport; game.js measures it and sets --board-w / --board-h on .game-layout. */
 .game-main { height: 100dvh; display: flex; justify-content: center; align-items: center; padding: 8px; overflow: hidden; }
 /* One framed card: HUD bar on top, board below. Sized for an iframe. */
-.game-layout { position: relative; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 8px; background: var(--tint); border: 1px solid #cbd1c1; border-radius: 14px; }
+.game-layout { position: relative; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 8px; background: var(--tint); border: 1px solid #cbd1c1; border-radius: 0; }
 .hud { width: max(var(--board-w, 320px), min(300px, calc(100vw - 34px))); display: flex; align-items: center; gap: 12px; padding: 8px; background: var(--paper); border-radius: 12px; }
 .hud-controls { margin-left: auto; display: flex; gap: 8px; }
 .stats { display: flex; gap: 10px; flex: 1; min-width: 0; }
