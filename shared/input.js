@@ -45,7 +45,7 @@ window.OGInput = {
       surface.addEventListener('pointermove', event => {
         if (!origin || event.pointerId !== origin.id) return;
         const dx = event.clientX - origin.x, dy = event.clientY - origin.y;
-        if (Math.max(Math.abs(dx), Math.abs(dy)) < 20) return;
+        if (Math.max(Math.abs(dx), Math.abs(dy)) < 12) return;
         direction(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up'));
         origin = { x: event.clientX, y: event.clientY, id: event.pointerId };
       });

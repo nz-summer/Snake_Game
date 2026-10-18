@@ -18,7 +18,7 @@ To run: open `index.html`, or serve the folder (`python -m http.server 8080`).
 
 | File | Role |
 | --- | --- |
-| `index.html` | Page markup: top bar (Score, Best Score, Pause, Sound, hidden Settings and Fullscreen), board canvas, Ready/Paused/Game over overlay, on-screen arrows. |
+| `index.html` | Page markup: top bar (Score, Best Score, Pause, Sound, hidden Settings and Fullscreen), board canvas, Ready/Paused/Game over overlay, touch swipe only. |
 | `logic.js` | Pure game rules (`SnakeLogic`), no DOM. `create(cols, rows)`, `turn`, `step`, `resize` (moves a game onto a new grid size), `foodFor`, `vectors`. Also exported with `module.exports` for Node tests. |
 | `game.js` | Responsive board sizing, game loop, drawing, scoring, crash animation, wiring of everything. |
 | `tests/logic.test.cjs` | Node tests for `logic.js` (`node --test tests/logic.test.cjs`). |
@@ -44,7 +44,7 @@ To run: open `index.html`, or serve the folder (`python -m http.server 8080`).
 The game sizes itself from its **own viewport** (the iframe), never from the parent site. `game.js` (`computeGrid` / `applyLayout`):
 
 - `.game-main` fills the viewport (`100dvh`, no page scroll). A `ResizeObserver` on it plus `window.resize` call `scheduleLayout` (one `requestAnimationFrame` per burst).
-- Space for the board = viewport minus page padding, the frame padding and everything above or below the board (top bar, on-screen arrows), which is **measured**, not hardcoded.
+- Space for the board = viewport minus page padding, the frame padding and everything above or below the board (top bar), which is **measured**, not hardcoded.
 - Preferred board shape by viewport width (width / height): 1200+ is 1.6 (16:10), 768-1199 is 1.5 (3:2), 600-767 is 1 (square), under 600 is 0.75 (3:4). The shape may stretch by `SLACK_WIDE` (1.6) or `SLACK_PORTRAIT` (1.35, phones) either way so little space is wasted. These are constants at the top of the section.
 - Cells are always square: `cell` is 18-40 CSS px (about board height / 17), `cols = floor(w / cell)`, `rows = floor(h / cell)`, minimum 8x8. The board is exactly `cols * cell` by `rows * cell`; the result is written to `--board-w` / `--board-h` on `.game-layout`, which the CSS uses for the top bar and `.play-area`. There is no fixed max width.
 - When the grid size changes mid-game, `SnakeLogic.resize` shifts the whole snake and the apple together (so shape and collisions stay valid) and re-rolls the apple only if it ends up off-grid or on the snake. A game in progress then auto-pauses. If the snake cannot fit at all it returns `'reset'` and `restart()` runs.
@@ -55,7 +55,7 @@ The game sizes itself from its **own viewport** (the iframe), never from the par
 - **Top bar:** Score card (green, apple icon) and Best Score card (cream, crown icon) on the left. Pause and Sound icon buttons on the right. Pause button swaps icon by `aria-pressed`; Sound button swaps by `aria-pressed` (true = on). Labels are updated through `aria-label`, not text.
 - **Ready screen:** overlay with class `is-ready`: a small card with an illustration, the saved best score (`#ready-best`, copied from `#best` in `ui.showOverlay`), four clickable arrow keys (`#overlay-keys`, they carry `data-direction` so `input.js` binds them and a tap starts the game), and a Play button. The board stays visible behind a light dark layer. The card shows only when the overlay title is exactly `'Ready'`; other overlays (Paused, Game over) use the plain style.
 - **Crash sequence (wall or self hit):** `game.js` `end()` does not show Game over at once. It sets `crashing`, plays the `crash` sound, and `crashLoop` animates for `CRASH_MS` (1100 ms): X eyes, long tongue, impact burst, short shake (skipped with reduced motion), then `showEnd()`. `restart()` cancels the crash. A win skips the crash and shows the end screen directly.
-- **On-screen arrow buttons** (`.dpad`) are a compact diamond below the board (up on top, left and right beside, down underneath; 46px soft green buttons with SVG arrows, about 148x116 px in all). They are hidden on devices with a mouse (`hover: hover` and `pointer: fine`); phones and tablets see them. `computeGrid` measures their height, so the board shrinks to make room. The Ready card also has its own small arrow keys.
+- **Touch controls:** there are no on-screen arrow buttons. Phones and tablets steer by swiping the board (`input.js`, 12 px threshold, turns fire during the drag so you can chain swipes without lifting). `(pointer: coarse)` also hides the Ready card arrow keys and disables page touch scrolling.
 - **Layout:** one framed card; see Responsive board. Fullscreen styles exist (`.is-focused`) and were checked through the focus view, but the button is hidden.
 
 ## Hidden features (deliberate, may return)

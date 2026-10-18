@@ -7,13 +7,13 @@
   <meta name="description" content="Play Snake for free. No ads, accounts, or tracking. A Moonstar Games browser game.">
   <title>Snake — Moonstar</title>
   <link rel="icon" href="shared/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="shared/style.css?v=2026-10-09">
+  <link rel="stylesheet" href="shared/style.css?v=2026-10-19">
 
-  <script src="sound/audio.js?v=2026-10-09" defer></script>
-  <script src="shared/ui.js?v=2026-10-09" defer></script>
-  <script src="shared/input.js?v=2026-10-09" defer></script>
-  <script src="logic.js?v=2026-10-09" defer></script>
-  <script src="game.js?v=2026-10-09" defer></script>
+  <script src="sound/audio.js?v=2026-10-19" defer></script>
+  <script src="shared/ui.js?v=2026-10-19" defer></script>
+  <script src="shared/input.js?v=2026-10-19" defer></script>
+  <script src="logic.js?v=2026-10-19" defer></script>
+  <script src="game.js?v=2026-10-19" defer></script>
 </head>
 <body class="game-page" data-game="snake">
   <a class="skip-link" href="#main">Skip to game</a>
@@ -50,7 +50,7 @@
                 <button type="button" data-difficulty="hard" aria-pressed="false">Hard</button>
               </div>
               <button id="restart" type="button">Restart</button>
-              <p id="control-hint" class="control-hint">Arrow keys / WASD · Swipe or use the arrows · Gamepad supported<br>R to restart · Esc to pause / exit fullscreen</p>
+              <p id="control-hint" class="control-hint">Arrow keys / WASD · Swipe the board · Gamepad supported<br>R to restart · Esc to pause / exit fullscreen</p>
             </div>
           </details>
           <button id="fullscreen" class="icon-button" type="button" aria-label="Fullscreen" title="Fullscreen" aria-pressed="false" hidden>
@@ -60,7 +60,7 @@
         </div>
       </div>
       <div class="play-area">
-        <canvas id="board" class="board" width="500" height="500" tabindex="0" aria-label="Snake game board" aria-describedby="control-hint">Arrow keys / WASD · Swipe or use the arrows · Gamepad supported</canvas>
+        <canvas id="board" class="board" width="500" height="500" tabindex="0" aria-label="Snake game board" aria-describedby="control-hint">Arrow keys / WASD · Swipe the board · Gamepad supported</canvas>
         <div id="overlay" class="overlay" role="region" aria-labelledby="overlay-title" hidden>
           <div class="overlay-card">
             <svg class="ready-art" viewBox="0 0 320 130" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
@@ -92,12 +92,6 @@
             <button id="overlay-action" type="button" class="primary">Play again</button>
           </div>
         </div>
-      </div>
-      <div class="dpad" role="group" aria-label="Direction controls">
-        <button type="button" data-direction="up" aria-label="Move up"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(0deg)"><path d="M12 19V5m0 0l-6.500 6.500M12 5l6.500 6.500"/></svg></button>
-        <button type="button" data-direction="left" aria-label="Move left"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(-90deg)"><path d="M12 19V5m0 0l-6.500 6.500M12 5l6.500 6.500"/></svg></button>
-        <button type="button" data-direction="right" aria-label="Move right"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(90deg)"><path d="M12 19V5m0 0l-6.500 6.500M12 5l6.500 6.500"/></svg></button>
-        <button type="button" data-direction="down" aria-label="Move down"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(180deg)"><path d="M12 19V5m0 0l-6.500 6.500M12 5l6.500 6.500"/></svg></button>
       </div>
     </div>
     <p id="announcement" class="sr-only" role="status" aria-live="polite"></p>
