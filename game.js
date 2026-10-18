@@ -8,10 +8,60 @@
   const ui = OG.createUI({ restart, togglePause });
   const view = OG.canvasView(canvas, draw);
   function bestKey() { return 'snake:best:' + ui.difficulty; }
+
+  // ---- Responsive board -------------------------------------------------------
+  // The board is sized from the space the page (the iframe viewport) really has, not
+  // from the parent site. Preferred shape by viewport width, as width / height:
+  // 1200+ wide 1.6 (16:10), 768-1199 1.5 (3:2), 600-767 1 (square), under 600 0.75 (3:4).
+  // The shape may stretch by SLACK_WIDE (SLACK_PORTRAIT on phones) either way to use the space that is left.
+  // Cells stay square: the board is cols x rows whole cells of `cell` CSS pixels.
+  const SLACK_WIDE = 1.6, SLACK_PORTRAIT = 1.35, MIN_CELL = 18, MAX_CELL = 40, TARGET_ROWS = 17, MIN_GRID = 8;
+  const main = document.querySelector('.game-main');
+  const layoutEl = document.querySelector('.game-layout');
+  const playArea = document.querySelector('.play-area');
+  let grid = { cols: 20, rows: 20, cell: 24 };
+  function preferredRatio(viewWidth) {
+    return viewWidth >= 1200 ? 1.6 : viewWidth >= 768 ? 1.5 : viewWidth >= 600 ? 1 : .75;
+  }
+  function computeGrid() {
+    const style = getComputedStyle(main);
+    const padX = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+    const padY = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
+    // Everything around the board (frame, top bar, arrow buttons) is measured, not assumed.
+    const frameStyle = getComputedStyle(layoutEl);
+    const frameX = parseFloat(frameStyle.paddingLeft) + parseFloat(frameStyle.paddingRight) + parseFloat(frameStyle.borderLeftWidth) + parseFloat(frameStyle.borderRightWidth);
+    const availW = Math.max(120, main.clientWidth - padX - frameX);
+    const availH = Math.max(120, main.clientHeight - padY - (layoutEl.offsetHeight - playArea.offsetHeight));
+    const preferred = preferredRatio(main.clientWidth);
+    const slack = main.clientWidth < 600 ? SLACK_PORTRAIT : SLACK_WIDE;
+    const ratio = Math.min(preferred * slack, Math.max(preferred / slack, availW / availH));
+    const boardW = Math.min(availW, availH * ratio), boardH = boardW / ratio;
+    let cell = Math.max(MIN_CELL, Math.min(MAX_CELL, Math.floor(Math.min(boardW, boardH) / TARGET_ROWS)));
+    let cols = Math.max(MIN_GRID, Math.floor(boardW / cell)), rows = Math.max(MIN_GRID, Math.floor(boardH / cell));
+    cell = Math.max(8, Math.min(cell, Math.floor(availW / cols), Math.floor(availH / rows)));
+    return { cols, rows, cell };
+  }
+  function applyLayout() {
+    const next = computeGrid();
+    const changed = next.cols !== grid.cols || next.rows !== grid.rows;
+    grid = next;
+    layoutEl.style.setProperty('--board-w', grid.cols * grid.cell + 'px');
+    layoutEl.style.setProperty('--board-h', grid.rows * grid.cell + 'px');
+    if (!state || !changed) { view.draw(); return; }
+    // Keep the game in progress when the grid changes: shift the snake onto the new grid, or
+    // start over if it cannot fit. A game in progress pauses so the player can get their bearings.
+    if (SnakeLogic.resize(state, grid.cols, grid.rows) === 'reset') { restart(); return; }
+    if (running && !paused && !state.over) togglePause();
+    view.draw();
+  }
+  let layoutFrame = 0;
+  function scheduleLayout() {
+    if (!layoutFrame) layoutFrame = requestAnimationFrame(() => { layoutFrame = 0; applyLayout(); });
+  }
   function restart(playImmediately = false) {
     cancelAnimationFrame(frame); frame = 0;
     cancelAnimationFrame(crashFrame); crashFrame = 0; crashing = false;
-    state = SnakeLogic.create(20);
+    state = SnakeLogic.create(grid.cols, grid.rows);
     running = paused = false;
     accumulator = 0;
     best = Number(OG.storage.get(bestKey(), 0)) || 0;
@@ -59,20 +109,22 @@
     crashing = true; crashStart = performance.now();
     crashFrame = requestAnimationFrame(crashLoop);
   }
-  function draw(ctx, size) {
+  function draw(ctx, width, height) {
     if (!state) return;
-    const cell = size / state.size;
-    ctx.clearRect(0, 0, size, size);
+    const cell = width / state.cols; // cells are always square: width / cols === height / rows
+    ctx.clearRect(0, 0, width, height);
     ctx.save();
     const age = crashing ? now - crashStart : 0;
     if (crashing && !OG.reducedMotion.matches && age < 450) {
       const fade = 1 - age / 450;
       ctx.translate(Math.sin(age / 22) * cell * .18 * fade, Math.cos(age / 17) * cell * .1 * fade);
     }
-    ctx.fillStyle = '#f8faef'; ctx.fillRect(0, 0, size, size);
+    ctx.fillStyle = '#f8faef'; ctx.fillRect(0, 0, width, height);
     ctx.strokeStyle = '#e1e9d6'; ctx.lineWidth = 1;
     ctx.beginPath();
-    for (let i = 1; i < state.size; i++) { ctx.moveTo(i * cell, 0); ctx.lineTo(i * cell, size); ctx.moveTo(0, i * cell); ctx.lineTo(size, i * cell); } ctx.stroke();
+    for (let i = 1; i < state.cols; i++) { ctx.moveTo(i * cell, 0); ctx.lineTo(i * cell, height); }
+    for (let i = 1; i < state.rows; i++) { ctx.moveTo(0, i * cell); ctx.lineTo(width, i * cell); }
+    ctx.stroke();
     if (state.food) {
       const x = (state.food.x + .5) * cell, y = (state.food.y + .5) * cell;
       const pulse = OG.reducedMotion.matches ? 1 : 1 + Math.sin(now / 240) * .05;
@@ -147,5 +199,8 @@
   document.addEventListener('visibilitychange', () => { if (document.hidden && running && !paused) togglePause(); });
   window.addEventListener('blur', () => { if (running && !paused) togglePause(); });
   OGInput.bind({ surface: canvas, direction: move, action: () => { if (state.over) { restart(); start(); } else if (paused) togglePause(); else if (!running) start(); }, pause: togglePause, restart: () => { restart(); start(); } });
+  applyLayout();
+  new ResizeObserver(scheduleLayout).observe(main);
+  window.addEventListener('resize', scheduleLayout);
   restart();
 })();
